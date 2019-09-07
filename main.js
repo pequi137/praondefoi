@@ -1,9 +1,17 @@
+var windowWidth =
+  window.innerWidth ||
+  document.documentElement.clientWidth ||
+  document.body.clientWidth;
+
+var windowHeight =
+  window.innerHeight ||
+  document.documentElement.clientHeight ||
+  document.body.clientHeight;
+
 var treemapLayout = d3
   .treemap()
-  .size([900, 600])
-  .padding(12);
-
-function stratifyOrcamento(csv) {}
+  .size([windowWidth, windowHeight])
+  .paddingOuter(14);
 
 function make(root) {
   var nodes = root.descendants();
@@ -42,11 +50,11 @@ function make(root) {
       return d.depth === 3 ? 0.5 * (d.y0 + d.y1) : d.y0 + 6;
     })
     .each(function(d) {
-      var label = d.depth === 0 ? "" : d.depth === 3 ? d.data.Film : d.data.key;
+      var label = d.depth === 1 ? d.data.key : "";
 
       d3.select(this)
         .text(label)
-        .style("font-size", d3.min([(1.4 * (d.x1 - d.x0)) / label.length, 11]))
+        .style("font-size", d3.min([(1.4 * (d.x1 - d.x0)) / label.length, 12]))
         .style("display", d.x1 - d.x0 < 10 || d.y0 - d.y1 < 10);
     })
     .style("text-anchor", function(d) {
@@ -56,13 +64,16 @@ function make(root) {
 }
 
 function ready(err, data) {
-  var nest = d3
+  let nest = d3
     .nest()
-    .key(function(d) {
-      return d.CATEGORIAECONOMICA;
+    .key(function(data) {
+      return data.CATEGORIAECONOMICA;
     })
-    .key(function(d) {
-      return d.GRUPONATUREZADESPESA;
+    .key(function(data) {
+      return data.GRUPONATUREZADESPESA;
+    })
+    .key(function(data) {
+      return data.MODALIDADEAPLICACAO;
     })
     .entries(data);
 
@@ -71,16 +82,20 @@ function ready(err, data) {
     values: nest
   };
 
-  var root = d3
-    .hierarchy(nest, function(d) {
-      return d.values;
+  let root = d3
+    .hierarchy(nest, function(data) {
+      return data.values;
     })
-    .sum(function(d) {
-      return d.VALORLIQUIDADO === undefined ? null : d.VALORLIQUIDADO;
+    .sum(function(data) {
+      return data.VALORLIQUIDADO;
     });
 
   treemapLayout(root);
   make(root);
 }
 
-d3.csv("dados.csv", ready);
+d3.text("dados.csv", function(err, raw) {
+  var dsv = d3.dsvFormat(";");
+  var data = dsv.parse(raw);
+  ready(err, data);
+});
