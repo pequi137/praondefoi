@@ -1,7 +1,8 @@
 body {
   margin: 0;
   font-family: "Helvetica Neue", Helvetica, sans-serif;
-  font-size: 9px;
+  width: 100vw;
+  height: 100vh;
 }
 
 rect {
@@ -14,6 +15,10 @@ text {
 }
 
 #chart {
-  width: 100vw;
-  height: calc(100vh - 5px);
+  height: 79%;
+}
+
+#chart svg {
+  width: 100%;
+  height: 100%;
 }

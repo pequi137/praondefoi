@@ -1,12 +1,7 @@
-var windowWidth =
-  window.innerWidth ||
-  document.documentElement.clientWidth ||
-  document.body.clientWidth;
+var windowWidth = document.getElementById("chart").offsetWidth;
+var windowHeight = document.getElementById("chart").offsetHeight;
 
-var windowHeight =
-  window.innerHeight ||
-  document.documentElement.clientHeight ||
-  document.body.clientHeight;
+console.log(windowWidth, windowHeight);
 
 var treemapLayout = d3
   .treemap()
@@ -17,7 +12,8 @@ function make(root) {
   var nodes = root.descendants();
 
   var u = d3
-    .select(".wrapper")
+    .select("#chart")
+    .append("svg")
     .selectAll("g.node")
     .data(nodes);
 
